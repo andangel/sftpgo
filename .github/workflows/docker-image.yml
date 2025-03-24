@@ -17,6 +17,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Get version tag
+        id: get_version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=edge" >> $GITHUB_OUTPUT
+          fi
+          echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -32,13 +42,11 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64  # 仅构建 x86 架构
+          platforms: linux/amd64
           push: true
           tags: |
+            ghcr.io/andangel/sftpgo:${{ steps.get_version.outputs.VERSION }}
+            ghcr.io/andangel/sftpgo:${{ steps.get_version.outputs.SHORT_SHA }}
             ghcr.io/andangel/sftpgo:latest
-            ghcr.io/andangel/sftpgo:${{ github.sha }}
           build-args: |
             FEATURES=nopgxregisterdefaulttypes,disable_grpc_modules,unixcrypt
-          labels: |
-            org.opencontainers.image.source=https://github.com/andangel/sftpgo
-            org.opencontainers.image.revision=${{ github.sha }}
