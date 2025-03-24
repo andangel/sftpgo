@@ -176,6 +176,8 @@ explicit grant from the SFTPGo Team (support@sftpgo.com).
     //{{- range .Languages}}
     //{{- if eq . "en"}}
     lngs.en = { nativeName: 'English' };
+    //{{- else if eq . "zh" }}
+    lngs.zh = { nativeName: '中文' };
     //{{- else if eq . "it" }}
     lngs.it = { nativeName: 'Italiano' };
     //{{- end}}
